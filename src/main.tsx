@@ -43,9 +43,6 @@ const Main: React.FC = () => {
   // スライドショーのインデックスを管理するstate
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  //  動画用のref
-  const videoRef = useRef<HTMLVideoElement>(null);
-
   // スライドショーの自動切り替え用のuseEffect
   const photoRefs = useRef<(HTMLImageElement | null)[]>([]);
 
@@ -69,29 +66,6 @@ const Main: React.FC = () => {
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
-
-  // 動画の再生・停止を制御するuseEffect
-  // IntersectionObserverを使用して、動画が画面に表示されているときのみ再生する
-  // 動画が画面外に出たときは停止する
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            video.play();
-          } else {
-            video.pause();
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-    observer.observe(video);
-    return () => observer.unobserve(video);
-  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -155,7 +129,6 @@ const Main: React.FC = () => {
           autoPlay
           loop
           muted
-          ref={videoRef}
         />
         <div className="photo-container mt-8 m-auto">
           {mugiImages.map((image, index) => (
@@ -185,7 +158,6 @@ const Main: React.FC = () => {
           autoPlay
           loop
           muted
-          ref={videoRef}
         />
         <div className="photo-container mt-8 m-auto">
           {tukuneImages.map((image, index) => (
