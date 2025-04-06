@@ -1,7 +1,39 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./CSS/main.css";
+import { PlayIcon, PauseIcon } from "@heroicons/react/24/solid";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import VideoPlayer from "./Component/VideoPlayer";
 
 const Main: React.FC = () => {
+  // スライドショーの再生と停止時のトーストメッセージの表示
+  const showToast = (type: "start" | "stop") => {
+    switch (type) {
+      case "start":
+        toast.success("再生しました!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        break;
+      case "stop":
+        toast.error("停止しました!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
   // スライドショー画像格納用の配列
   const images = [
     `${process.env.PUBLIC_URL}/photo/slideShow/photo1.jpeg`,
@@ -43,17 +75,59 @@ const Main: React.FC = () => {
   // スライドショーのインデックスを管理するstate
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // スライドショーの再生と停止制御
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  // 再生と停止ボタンの表示用
+  const [showControls, setShowControls] = useState(false);
+
+  // スライドショーの表示感覚を管理するstate
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   // スライドショーの自動切り替え用のuseEffect
   const photoRefs = useRef<(HTMLImageElement | null)[]>([]);
 
-  // スライドショーの切り替え用の関数
+  // スライドショーの自動切り替え用のuseEffect
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 7000);
+    if (isPlaying) {
+      intervalRef.current = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+      }, 5000);
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
 
-    return () => clearInterval(intervalId);
-  }, [images.length]);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isPlaying, images.length]);
+
+  // 画像をクリックしたときの処理
+  const handleImageClick = () => {
+    setIsPlaying(!isPlaying);
+    setShowControls(true);
+    showToast(isPlaying ? "stop" : "start");
+    setTimeout(() => {
+      setShowControls(false);
+    }, 1000);
+  };
+
+  // 再生ボタンを押下時の制御
+  const handlePlayClick = () => {
+    setIsPlaying(true);
+    showToast("start");
+  };
+
+  // 停止ボタン押下時の制御
+  const handlePauseClick = () => {
+    setIsPlaying(false);
+    showToast("stop");
+  };
 
   // 前の画像に戻る関数
   const handlePrev = () => {
@@ -67,6 +141,7 @@ const Main: React.FC = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
 
+  // 画像のロードが完了したら、その画像の要素を取得する
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -90,6 +165,7 @@ const Main: React.FC = () => {
 
   return (
     <div>
+      <ToastContainer />
       <section className="slide-section">
         <div className="slideshow-container">
           <div className="slideshow-controls">
@@ -99,6 +175,19 @@ const Main: React.FC = () => {
             <button onClick={handleNext} className="slideshow-button">
               &gt;
             </button>
+            {showControls && (
+              <div className="controls">
+                {isPlaying ? (
+                  <button onClick={handlePlayClick} className="control-button">
+                    <PlayIcon className="w-6 h-6 text-white" />
+                  </button>
+                ) : (
+                  <button onClick={handlePauseClick} className="control-button">
+                    <PauseIcon className="w-6 h-6 text-white" />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
           <div className="slide">
             {images.map((image, index) => (
@@ -112,6 +201,7 @@ const Main: React.FC = () => {
                   src={image}
                   alt={`むぎとつくね ${index + 1}`}
                   className="slide-image"
+                  onClick={handleImageClick}
                 />
               </div>
             ))}
@@ -122,13 +212,8 @@ const Main: React.FC = () => {
         <h1 className="mugi-font md:text-5xl text-3xl mt-8 mb-8 text-center title">
           Mugi
         </h1>
-        <video
-          className="w-full"
+        <VideoPlayer
           src={`${process.env.PUBLIC_URL}/movie/mugi/mugi_movie1.mp4`}
-          controls
-          autoPlay
-          loop
-          muted
         />
         <div className="photo-container mt-8 m-auto">
           {mugiImages.map((image, index) => (
@@ -151,13 +236,8 @@ const Main: React.FC = () => {
         <h1 className="tukune-font md:text-5xl text-3xl mt-12 mb-4 text-center title">
           Tukune
         </h1>
-        <video
-          className="w-full"
+        <VideoPlayer
           src={`${process.env.PUBLIC_URL}/movie/tukune/tukune_movie1.mp4`}
-          controls
-          autoPlay
-          loop
-          muted
         />
         <div className="photo-container mt-8 m-auto">
           {tukuneImages.map((image, index) => (

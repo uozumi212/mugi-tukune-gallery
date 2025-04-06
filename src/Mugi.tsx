@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./CSS/main.css";
+import VideoPlayer from "./Component/VideoPlayer";
 
 const Mugi: React.FC = () => {
   // スライドショー画像格納用の配列
@@ -56,15 +57,11 @@ const Mugi: React.FC = () => {
         </h2>
         {mugiMovies.map((movie, index) => {
           return (
-            <div key={index} className="mugi-video-container">
-              <video
-                className="w-full object-cover mt-2"
-                autoPlay
-                loop
-                muted
-                controls
-                src={movie}
-              />
+            <div
+              key={index}
+              className="mugi-video-container w-full object-cover mt-2"
+            >
+              <VideoPlayer src={movie} />
             </div>
           );
         })}
