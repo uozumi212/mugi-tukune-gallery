@@ -59,7 +59,7 @@ const Mugi: React.FC = () => {
           return (
             <div
               key={index}
-              className="mugi-video-container w-full object-cover mt-2"
+              className="mugi-video-container w-full object-cover mt-12"
             >
               <VideoPlayer src={movie} />
             </div>
