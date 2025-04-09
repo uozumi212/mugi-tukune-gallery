@@ -4,6 +4,7 @@ import Header from "./Component/Header";
 import Main from "./main";
 import Footer from "./Component/Footer";
 import Mugi from "./Mugi";
+import Tukune from "./Tukune";
 
 function App() {
   // メニューの開閉状態を管理するstate
@@ -29,6 +30,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Main />} />
           <Route path="/mugi" element={<Mugi />} />
+          <Route path="/tukune" element={<Tukune />} />
         </Routes>
         <Footer />
       </div>

@@ -67,6 +67,17 @@ const Header: React.FC<HeaderProps> = ({ isOpen, setIsOpen }) => {
               Mugi
             </Link>
           </li>
+          <li>
+            <Link
+              to="/tukune"
+              className={`block py-2 hover:text-gray-300 text-2xl ${
+                isOpen ? "border-b-2 mt-2 border-white" : "text-md"
+              }`}
+              onClick={handleLinkClick}
+            >
+              Tukune
+            </Link>
+          </li>
         </ul>
       </nav>
     </header>
